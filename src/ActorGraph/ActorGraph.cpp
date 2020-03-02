@@ -53,6 +53,33 @@ bool ActorGraph::buildGraphFromFile(const char* filename) {
         int year = stoi(record[2]);
 
         // TODO: we have an actor/movie relationship to build the graph
+
+        // concatenate movie title and year
+        string title = title + "#@" + std::to_string(year);
+
+        Actor* theActor;
+        Movie* movie;
+
+        // check if actorMap contains actor
+        // if actor not created, create actor and add to map
+        if (actorMap.find(actor) == actorMap.end()) {
+            theActor = new Actor(actor);
+            actorMap[actor] = theActor;
+        }
+        theActor = actorMap[actor];
+
+        // check if movieMap contains movie
+        // if movie not created, create and add to map
+        if (movieMap.find(title) == movieMap.end()) {
+            movie = new Movie(title);
+            movieMap[title] = movie;
+        }
+        movie = movieMap[title];
+
+        // add movie ptr to actor's movieList
+        theActor->movieList.push_back(movie);
+        // add actor ptr to movie's actorList
+        movie->actorList.push_back(theActor);
     }
 
     // if failed to read the file, clear the graph and return
@@ -67,7 +94,19 @@ bool ActorGraph::buildGraphFromFile(const char* filename) {
 
 /* TODO */
 void ActorGraph::BFS(const string& fromActor, const string& toActor,
-                     string& shortestPath) {}
+                     string& shortestPath) {
+    Actor* from = actorMap[fromActor];
+
+    // add from actor to queue
+    // while queue not empty add each actor in each movie to queue
+    // set previous
+    // if current actor's name = toActor: break
+
+    // add names of actor and movie to a vector of string
+    // go from destination actor until fromActor
+
+    // concatenate vector's stirngs to shortest Path
+}
 
 /* TODO */
 void ActorGraph::predictLink(const string& queryActor,
