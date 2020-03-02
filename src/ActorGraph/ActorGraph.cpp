@@ -5,8 +5,11 @@
 #include "ActorGraph.hpp"
 #include <fstream>
 #include <iostream>
+#include <queue>
 #include <sstream>
 #include <string>
+#include "Actor.hpp"
+#include "Movie.hpp"
 
 using namespace std;
 
@@ -55,7 +58,7 @@ bool ActorGraph::buildGraphFromFile(const char* filename) {
         // TODO: we have an actor/movie relationship to build the graph
 
         // concatenate movie title and year
-        string title = title + "#@" + std::to_string(year);
+        title = title + "#@" + std::to_string(year);
 
         Actor* theActor;
         Movie* movie;
@@ -95,17 +98,70 @@ bool ActorGraph::buildGraphFromFile(const char* filename) {
 /* TODO */
 void ActorGraph::BFS(const string& fromActor, const string& toActor,
                      string& shortestPath) {
+    // if fromActor and toActor are same person
+    if (fromActor == toActor) {
+    }
+
+    // set the boolean conditions of all actor vertices to false
+    for (auto i : actorMap) {
+        i.second->visited = 0;
+        i.second->inQueue = 0;
+    }
     Actor* from = actorMap[fromActor];
+    Actor* to;
+    std::queue<Actor*> bfsQueue;
+
+    bfsQueue.push(from);
 
     // add from actor to queue
+
     // while queue not empty add each actor in each movie to queue
-    // set previous
-    // if current actor's name = toActor: break
+    while (!bfsQueue.empty()) {
+        // dequeue the the actor pointer and set as visited
+        Actor* curr = bfsQueue.front();
+        bfsQueue.pop();
+        curr->visited = true;
 
-    // add names of actor and movie to a vector of string
-    // go from destination actor until fromActor
+        // go to each movie of current actor's movieList
+        for (Movie* mov : curr->movieList) {
+            // set the movie's previous to current actor
+            mov->previous = curr;
 
-    // concatenate vector's stirngs to shortest Path
+            // go to each actor of the movie's actorlist
+            for (Actor* act : mov->actorList) {
+                // OR visited set
+                if (!act->visited && !act->inQueue) {
+                    // set the actor's previous to the current movie
+                    act->previous = mov;
+
+                    // check if actor matches the toActor
+                    if (act->name == toActor) {
+                        to = act;
+                        break;
+                    }
+
+                    // add the actor ptr to queue
+                    bfsQueue.push(act);
+                    act->inQueue = true;
+                }
+            }
+        }
+    }
+
+    // no path from fromActor to toActor, path remains empty
+    if (to == 0) {
+        return;
+    }
+
+    // to is the ptr to the toActor
+    Actor* vertex = to;
+    while (vertex->name != fromActor) {
+        shortestPath.insert(0, vertex->name);
+        Movie* edge = vertex->previous;
+        shortestPath.insert(0, edge->name);
+        vertex = edge->previous;
+    }
+    shortestPath.insert(0, vertex->name);
 }
 
 /* TODO */
@@ -114,4 +170,11 @@ void ActorGraph::predictLink(const string& queryActor,
                              unsigned int numPrediction) {}
 
 /* TODO */
-ActorGraph::~ActorGraph() {}
+ActorGraph::~ActorGraph() {
+    for (auto i : actorMap) {
+        delete (i.second);
+    }
+    for (auto j : movieMap) {
+        delete (j.second);
+    }
+}

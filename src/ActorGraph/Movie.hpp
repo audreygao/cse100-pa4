@@ -1,19 +1,22 @@
+#ifndef MOVIE_HPP
+#define MOVIE_HPP
 #include <string>
 #include <vector>
-#include "Actor.hpp"
+//#include "Actor.hpp"
 using namespace std;
+
+class Actor;
+
 class Movie {
   public:
     string name;
     vector<Actor*> actorList;
     Actor* previous;
-    Movie(string movieName);
-    ~Movie();
+    Movie(string movieName) {
+        name = movieName;
+        previous = 0;
+    }
+    //~Movie();
 };
 
-Movie::Movie(string movieName) {
-    name = movieName;
-    previous = 0;
-}
-
-Movie::~Movie() {}
+#endif
