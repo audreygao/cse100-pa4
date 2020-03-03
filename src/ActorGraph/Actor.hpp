@@ -2,7 +2,7 @@
 #define ACTOR_HPP
 #include <string>
 #include <vector>
-//#include "Movie.hpp"
+#include "Movie.hpp"
 using namespace std;
 
 class Movie;
