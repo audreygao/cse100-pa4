@@ -95,9 +95,35 @@ bool ActorGraph::buildGraphFromFile(const char* filename) {
     return true;
 }
 
+void ActorGraph::helperFill(string actor, string title, int year) {
+    title = title + "#@" + std::to_string(year);
+    Actor* theActor;
+    Movie* movie;
+    if (actorMap.find(actor) == actorMap.end()) {
+        theActor = new Actor(actor);
+        actorMap[actor] = theActor;
+    }
+    theActor = actorMap[actor];
+
+    // check if movieMap contains movie
+    // if movie not created, create and add to map
+    if (movieMap.find(title) == movieMap.end()) {
+        movie = new Movie(title);
+        movieMap[title] = movie;
+    }
+    movie = movieMap[title];
+
+    // add movie ptr to actor's movieList
+    theActor->movieList.push_back(movie);
+    // add actor ptr to movie's actorList
+    movie->actorList.push_back(theActor);
+}
+
 /* TODO */
 void ActorGraph::BFS(const string& fromActor, const string& toActor,
                      string& shortestPath) {
+    std::unordered_map<string, int> movieSearched;
+
     // if fromActor and toActor are same person
     if (fromActor == toActor) {
     }
@@ -112,37 +138,44 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
     std::queue<Actor*> bfsQueue;
 
     bfsQueue.push(from);
-
+    from->inQueue = true;
+    bool flag = false;
     // add from actor to queue
 
     // while queue not empty add each actor in each movie to queue
-    while (!bfsQueue.empty()) {
+    while (!bfsQueue.empty() && !flag) {
         // dequeue the the actor pointer and set as visited
         Actor* curr = bfsQueue.front();
         bfsQueue.pop();
-        curr->visited = true;
+        // curr->visited = true;
 
         // go to each movie of current actor's movieList
         for (Movie* mov : curr->movieList) {
+            if (flag) {
+                break;
+            }
             // set the movie's previous to current actor
-            mov->previous = curr;
+            if (movieSearched.find(mov->name) == movieSearched.end()) {
+                mov->previous = curr;
+                movieSearched[mov->name] = 1;
 
-            // go to each actor of the movie's actorlist
-            for (Actor* act : mov->actorList) {
-                // OR visited set
-                if (!act->visited && !act->inQueue) {
-                    // set the actor's previous to the current movie
-                    act->previous = mov;
+                // go to each actor of the movie's actorlist
+                for (Actor* act : mov->actorList) {
+                    // OR visited set
+                    if (!act->inQueue) {
+                        // set the actor's previous to the current movie
+                        act->previous = mov;
 
-                    // check if actor matches the toActor
-                    if (act->name == toActor) {
-                        to = act;
-                        break;
+                        // add the actor ptr to queue
+                        bfsQueue.push(act);
+                        act->inQueue = true;
+                        // check if actor matches the toActor
+                        if (act->name == toActor) {
+                            flag = true;
+                            to = act;
+                            break;
+                        }
                     }
-
-                    // add the actor ptr to queue
-                    bfsQueue.push(act);
-                    act->inQueue = true;
                 }
             }
         }
@@ -155,13 +188,22 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
 
     // to is the ptr to the toActor
     Actor* vertex = to;
-    while (vertex->name != fromActor) {
+
+    while (vertex != from) {
+        shortestPath.insert(0, ")");
         shortestPath.insert(0, vertex->name);
+        shortestPath.insert(0, "]-->(");
+
         Movie* edge = vertex->previous;
         shortestPath.insert(0, edge->name);
+        shortestPath.insert(0, "--[");
+
         vertex = edge->previous;
     }
+
+    shortestPath.insert(0, ")");
     shortestPath.insert(0, vertex->name);
+    shortestPath.insert(0, "(");
 }
 
 /* TODO */

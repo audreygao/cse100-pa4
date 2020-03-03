@@ -18,16 +18,18 @@ using namespace std;
  */
 class ActorGraph {
   protected:
-    std::unordered_map<string, Actor*> actorMap;
-    std::unordered_map<string, Movie*> movieMap;
     // TODO: add data structures used in actor graph
 
   public:
+    std::unordered_map<string, Actor*> actorMap;
+    std::unordered_map<string, Movie*> movieMap;
     /* TODO */
     ActorGraph();
 
     /* TODO */
     bool buildGraphFromFile(const char* filename);
+
+    void helperFill(string name, string mov, int year);
 
     /* TODO */
     void BFS(const string& fromActor, const string& toActor,
