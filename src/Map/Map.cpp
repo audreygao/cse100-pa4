@@ -1,6 +1,7 @@
 
 #include "Map.hpp"
-
+#include <climits>
+#include <queue>
 /* TODO */
 Map::Map() {}
 
@@ -88,12 +89,134 @@ bool Map::addEdge(const string& name1, const string& name2) {
     return true;
 }
 
-/* TODO */
-void Map::Dijkstra(const string& from, const string& to,
-                   vector<Vertex*>& shortestPath) {}
+// comparator for priority queue
+bool cmp(Vertex* a, Vertex* b) {
+    return a->dist > b->dist;
+
+    // // different frequency, return the one with larger frequncy
+    // if (a.second != b.second) {
+    //     return a.second < b.second;
+    // }
+
+    // // same frequency, compare ascii value of string
+    // return a.first > b.first;
+}
 
 /* TODO */
-void Map::findMST(vector<Edge*>& MST) {}
+void Map::Dijkstra(const string& from, const string& to,
+                   vector<Vertex*>& shortestPath) {
+    priority_queue<Vertex*, vector<Vertex*>, decltype(&cmp)> que(cmp);
+
+    // set dist, done and parent
+    for (Vertex* v : vertices) {
+        v->done = false;
+        v->dist = INT_MAX;
+        v->parent = nullptr;
+    }
+
+    Vertex* start = vertices.at(vertexId[from]);
+    start->dist = 0;
+    que.push(start);
+
+    while (!que.empty) {
+        Vertex* parent = que.top();
+        que.pop();
+
+        if (!parent->done) {
+            parent->done = true;
+            for (Edge* e : parent->outEdges) {
+                Vertex* target = e->target;
+                float c = target->dist + e->weight;
+                if (c < target->dist) {
+                    target->parent = parent;
+                    target->dist = c;
+                    que.push(target);
+                }
+            }
+        }
+    }
+
+    Vertex* end = vertices.at(vertexId[to]);
+    Vertex* prev = end;
+    while (prev != 0) {
+        shortestPath.insert(shortestPath.begin(), prev);
+        prev = prev->parent;
+    }
+}
+
+bool cmpEdge(Edge* a, Edge* b) { return a->weight > b->weight; }
+
+void Map::combine(Vertex* a, Vertex* b) {
+    // index of both's centinodes
+    int indexA = find(a);
+    int indexB = find(b);
+
+    // compare the size of the two sets
+    int countA = upIndex[indexA];
+    int countB = upIndex[indexB];
+
+    // set A is larger in size
+    if (countA < countB) {
+        // make vertex b's centinode a's centinode
+        upIndex[indexB] = indexA;
+
+        // change the size of the a's centinode
+        upIndex[indexA] = countA + countB;
+    } else {
+        // make vertex a's centinode b's centinode
+        upIndex[indexA] = indexB;
+
+        // change the size of the a's centinode
+        upIndex[indexB] = countA + countB;
+    }
+}
+
+int Map::find(Vertex* v) {
+    vector<int> indices;
+    int index = vertexId[v->name];
+
+    // record the indices of all the vertices on the path
+    while (upIndex[index] >= 0) {
+        indices.push_back(index);
+        index = upIndex[index];
+    }
+
+    // the index of the centinode
+    int root = index;
+
+    // point all vertices on the path to the root: path compression
+    for (int i : indices) {
+        upIndex[i] = root;
+    }
+
+    return root;
+}
+
+/* TODO */
+void Map::findMST(vector<Edge*>& MST) {
+    // initialize the up trees
+    upIndex = vector<int>(vertices.size(), -1);
+
+    priority_queue<Edge*, vector<Edge*>, decltype(&cmpEdge)> que(cmpEdge);
+
+    // push all edges into pq
+    for (Edge* e : undirectedEdges) {
+        que.push(e);
+    }
+
+    // pop smallest edge
+    while (!que.empty) {
+        Edge* smallest = que.top();
+        que.pop();
+
+        // edge doesn't make a cycle
+        if (find(smallest->source) != find(smallest->target)) {
+            MST.push_back(smallest);
+            combine(smallest->source,
+                    smallest->target);  // union the two vertices
+        }
+    }
+}
 
 /* TODO */
 void Map::crucialRoads(vector<Edge*>& roads) {}

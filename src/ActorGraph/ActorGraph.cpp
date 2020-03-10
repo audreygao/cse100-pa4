@@ -126,6 +126,7 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
 
     // if fromActor and toActor are same person
     if (fromActor == toActor) {
+        return;
     }
 
     // set the boolean conditions of all actor vertices to false
@@ -133,6 +134,16 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
         i.second->visited = 0;
         i.second->inQueue = 0;
     }
+
+    // if the from actor is not in the graph
+    if (actorMap.find(fromActor) == actorMap.end()) {
+        return;
+    }
+    // if to actor is not in the graph
+    if (actorMap.find(toActor) == actorMap.end()) {
+        return;
+    }
+
     Actor* from = actorMap[fromActor];
     Actor* to;
     std::queue<Actor*> bfsQueue;
@@ -141,14 +152,12 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
     from->inQueue = true;
     bool flag = false;
     // add from actor to queue
-
     // while queue not empty add each actor in each movie to queue
     while (!bfsQueue.empty() && !flag) {
         // dequeue the the actor pointer and set as visited
         Actor* curr = bfsQueue.front();
         bfsQueue.pop();
         // curr->visited = true;
-
         // go to each movie of current actor's movieList
         for (Movie* mov : curr->movieList) {
             if (flag) {
@@ -165,7 +174,6 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
                     if (!act->inQueue) {
                         // set the actor's previous to the current movie
                         act->previous = mov;
-
                         // add the actor ptr to queue
                         bfsQueue.push(act);
                         act->inQueue = true;
@@ -182,10 +190,9 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
     }
 
     // no path from fromActor to toActor, path remains empty
-    if (to == 0) {
+    if (!flag) {
         return;
     }
-
     // to is the ptr to the toActor
     Actor* vertex = to;
 
@@ -200,7 +207,6 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
 
         vertex = edge->previous;
     }
-
     shortestPath.insert(0, ")");
     shortestPath.insert(0, vertex->name);
     shortestPath.insert(0, "(");
@@ -219,4 +225,15 @@ ActorGraph::~ActorGraph() {
     for (auto j : movieMap) {
         delete (j.second);
     }
+}
+
+void ActorGraph::helper(const char* name, vector<string> str) {
+    ofstream myfile;
+    myfile.open(name);
+    for (string i : str) {
+        myfile << i;
+        myfile << "\n";
+    }
+    myfile.close();
+    buildGraphFromFile(name);
 }

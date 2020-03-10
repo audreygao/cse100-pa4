@@ -24,3 +24,21 @@ TEST(ActorGraphTests, test1) {
         path,
         "(Kevin Bacon)--[X-Men: First Class#@2011]-->(Michael Fassbender)");
 }
+
+TEST(ActorGraphTests, test2) {
+    ActorGraph graph;
+    vector<string> vec = {"Actor/Actress\tMovie\tYear",
+                          "Kevin Bacon\tX-Men: First Class\t2011",
+                          "James McAvoy\tX-Men: First Class\t2011"};
+
+    graph.helper("sample.tsv", vec);
+    string path;
+    graph.BFS("Kevin Bacon", "James McAvoy", path);
+    ASSERT_EQ(path,
+              "(Kevin Bacon)--[X-Men: First Class#@2011]-->(James McAvoy)");
+    // string path;
+    // graph.BFS("Robert Downey Jr.", "James McAvoy", path);
+    // ASSERT_EQ(path,
+    //           "(Robert Downey Jr.)--[Avengers: Endgame#@2019]-->(Samuel L. "
+    //           "Jackson)--[Glass#@2019]-->(James McAvoy)");
+}

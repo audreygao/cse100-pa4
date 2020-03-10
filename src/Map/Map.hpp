@@ -16,6 +16,8 @@ class Map {
     // vector storing vertices in the map: id of each vertex = index in vector
     vector<Vertex*> vertices;
 
+    vector<int> upIndex;
+
     // Map: name of vertex -> id of vertex = index storing vertex ptr
     unordered_map<string, unsigned int> vertexId;
 
@@ -45,6 +47,10 @@ class Map {
     /* TODO */
     void Dijkstra(const string& from, const string& to,
                   vector<Vertex*>& shortestPath);
+
+    void combine(Vertex* a, Vertex* b);
+
+    int find(Vertex* v);
 
     /* TODO */
     void findMST(vector<Edge*>& MST);

@@ -1,6 +1,7 @@
 #ifndef VERTEX_HPP
 #define VERTEX_HPP
 
+#include <climits>
 #include <string>
 #include <vector>
 
@@ -12,6 +13,9 @@ class Edge;
  * coordinates in the map */
 class Vertex {
   public:
+    Vertex* parent = nullptr;
+    int dist = INT_MAX;
+    bool done = false;
     const string name;
     float x;
     float y;
