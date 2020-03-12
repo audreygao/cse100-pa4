@@ -24,6 +24,7 @@ class Map {
     // Directed edge in vector represents an undirected edge used in MST
     vector<Edge*> undirectedEdges;
 
+  public:
     /*
      * Add a vertex with name and x, y coordinates to the map graph. Returns
      * false if the name already existed in the map graph, and true otherwise
@@ -36,7 +37,7 @@ class Map {
      */
     bool addEdge(const string& name1, const string& name2);
 
-  public:
+    // public:
     /* TODO */
     Map();
 
@@ -55,6 +56,7 @@ class Map {
     /* TODO */
     void findMST(vector<Edge*>& MST);
 
+    bool BFS(Vertex* from, Vertex* to);
     /* TODO */
     void crucialRoads(vector<Edge*>& roads);
 

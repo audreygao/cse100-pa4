@@ -118,7 +118,7 @@ void Map::Dijkstra(const string& from, const string& to,
     start->dist = 0;
     que.push(start);
 
-    while (!que.empty) {
+    while (!que.empty()) {
         Vertex* parent = que.top();
         que.pop();
 
@@ -126,7 +126,7 @@ void Map::Dijkstra(const string& from, const string& to,
             parent->done = true;
             for (Edge* e : parent->outEdges) {
                 Vertex* target = e->target;
-                float c = target->dist + e->weight;
+                float c = parent->dist + e->weight;
                 if (c < target->dist) {
                     target->parent = parent;
                     target->dist = c;
@@ -205,7 +205,7 @@ void Map::findMST(vector<Edge*>& MST) {
     }
 
     // pop smallest edge
-    while (!que.empty) {
+    while (!que.empty()) {
         Edge* smallest = que.top();
         que.pop();
 
@@ -218,8 +218,63 @@ void Map::findMST(vector<Edge*>& MST) {
     }
 }
 
+bool Map::BFS(Vertex* from, Vertex* to) {
+    // for (Vertex* v : vertices) {
+    //     v->done = false;
+    //     // v->dist = INT_MAX;
+    //     // v->parent = nullptr;
+    // }
+
+    queue<Vertex*> que;
+
+    que.push(from);
+
+    while (!que.empty()) {
+        Vertex* v = que.front();
+        que.pop();
+        v->done = true;
+        std::cout << v->name << endl;
+        for (Edge* edge : v->outEdges) {
+            Vertex* next = edge->target;
+
+            // skip this edge
+            if ((v == from && next == to) || (v == to && next == from)) {
+                continue;
+            }
+            if (!next->done) {
+                que.push(next);
+            }
+            if (next == to) {
+                std::cout << v->name << endl;
+                std::cout << next->name << endl;
+                std::cout << "true" << endl;
+                return true;
+            }
+        }
+    }
+    std::cout << "false" << endl;
+    return false;
+}
+
 /* TODO */
-void Map::crucialRoads(vector<Edge*>& roads) {}
+void Map::crucialRoads(vector<Edge*>& roads) {
+    // for (Vertex* v : vertices) {
+    //     v->done = false;
+    //     // v->dist = INT_MAX;
+    //     // v->parent = nullptr;
+    // }
+
+    for (Edge* edge : undirectedEdges) {
+        for (Vertex* v : vertices) {
+            v->done = false;
+            // v->dist = INT_MAX;
+            // v->parent = nullptr;
+        }
+        if (!BFS(edge->source, edge->target)) {
+            roads.push_back(edge);
+        }
+    }
+}
 
 /* Destructor of Map graph */
 Map::~Map() {
