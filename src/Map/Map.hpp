@@ -96,6 +96,9 @@ class Map {
      */
     void crucialRoads(vector<Edge*>& roads);
 
+    void helperBuild(string name1, string name2, vector<string> ver,
+                     vector<string> edge);
+
     /* Destructor of Map graph */
     ~Map();
 };

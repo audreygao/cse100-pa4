@@ -315,3 +315,23 @@ Map::~Map() {
         delete e;
     }
 }
+
+void Map::helperBuild(string name1, string name2, vector<string> ver,
+                      vector<string> edge) {
+    ofstream myfile1;
+    myfile1.open(name1);
+    for (string i : ver) {
+        myfile1 << i;
+        myfile1 << "\n";
+    }
+    myfile1.close();
+
+    ofstream myfile2;
+    myfile2.open(name2);
+    for (string i : edge) {
+        myfile2 << i;
+        myfile2 << "\n";
+    }
+    myfile2.close();
+    buildMapFromFile(name1, name2);
+}

@@ -61,3 +61,10 @@ TEST(MAPTESTS, TEST_CR) {
     ASSERT_EQ(roads[0]->source->name, "C");
     ASSERT_EQ(roads[0]->target->name, "D");
 }
+
+TEST(MAPTESTS, TEST_BUILD) {
+    Map map;
+    vector<string> v = {"A 0 0", "B 3 0"};
+    vector<string> e = {"A B"};
+    map.helperBuild("v.tsv", "e.tsv", v, e);
+}
