@@ -1,5 +1,8 @@
 /**
- * TODO: add file header
+ * Author: Ya Gao, Qingyang Xu
+ * Emails: yag003@ucsd.edu, q4xu@ucsd.edu
+ * Description: this file contains information for the
+ * ActorGraph including methods to realize its functionality
  */
 
 #include "ActorGraph.hpp"
@@ -8,15 +11,14 @@
 #include <queue>
 #include <sstream>
 #include <string>
-//#include "Actor.hpp"
-//#include "Movie.hpp"
 
 using namespace std;
 
-/* TODO */
+/* constructor */
 ActorGraph::ActorGraph() {}
 
-/* Build the actor graph from dataset file.
+/**
+ *  Build the actor graph from dataset file.
  * Each line of the dataset file must be formatted as:
  * ActorName <tab> MovieName <tab> Year
  * Two actors are connected by an undirected edge if they have worked in a movie
@@ -95,6 +97,10 @@ bool ActorGraph::buildGraphFromFile(const char* filename) {
     return true;
 }
 
+/**
+ * method to build the graph not from a file
+ * for unit testing
+ */
 void ActorGraph::helperFill(string actor, string title, int year) {
     title = title + "#@" + std::to_string(year);
     Actor* theActor;
@@ -119,7 +125,11 @@ void ActorGraph::helperFill(string actor, string title, int year) {
     movie->actorList.push_back(theActor);
 }
 
-/* TODO */
+/**
+ * find the unweighted shortest path from fromActor
+ * to toActor and record it in shortestPath
+ * can be any shortest path if there're multiple of them
+ */
 void ActorGraph::BFS(const string& fromActor, const string& toActor,
                      string& shortestPath) {
     std::unordered_map<string, int> movieSearched;
@@ -148,6 +158,7 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
     Actor* to;
     std::queue<Actor*> bfsQueue;
 
+    // push the source vertex into the queue
     bfsQueue.push(from);
     from->inQueue = true;
     bool flag = false;
@@ -196,6 +207,7 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
     // to is the ptr to the toActor
     Actor* vertex = to;
 
+    // backtracking from the destrination to the source and record
     while (vertex != from) {
         shortestPath.insert(0, ")");
         shortestPath.insert(0, vertex->name);
@@ -207,18 +219,21 @@ void ActorGraph::BFS(const string& fromActor, const string& toActor,
 
         vertex = edge->previous;
     }
+
+    // record the source vertex name
     shortestPath.insert(0, ")");
     shortestPath.insert(0, vertex->name);
     shortestPath.insert(0, "(");
 }
 
-/* TODO */
+/* Extra credit only */
 void ActorGraph::predictLink(const string& queryActor,
                              vector<string>& predictionNames,
                              unsigned int numPrediction) {}
 
-/* TODO */
+/* destructor of the ActorGraph */
 ActorGraph::~ActorGraph() {
+    // delete all the Actor and Movie created
     for (auto i : actorMap) {
         delete (i.second);
     }
@@ -227,6 +242,11 @@ ActorGraph::~ActorGraph() {
     }
 }
 
+/**
+ * unit testing purpose: build the graph
+ * creating a graph with the input information
+ * and call buildGraphFromFile to build the graph
+ */
 void ActorGraph::helper(const char* name, vector<string> str) {
     ofstream myfile;
     myfile.open(name);

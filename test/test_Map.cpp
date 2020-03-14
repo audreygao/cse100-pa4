@@ -1,10 +1,16 @@
+/**
+ * Author: Ya Gao, Qingyang Xu
+ * Emails: yag003@ucsd.edu, q4xu@ucsd.edu
+ * Description: this file contains tests for the
+ * map and its methods
+ */
 #include <gtest/gtest.h>
 #include "Map.hpp"
 
 using namespace std;
 using namespace testing;
 
-// TODO: add tests for map graph
+// add tests for map graph
 TEST(MAPTESTS, TEST_D) {
     Map map;
     map.addVertex("A", 0, 0);
@@ -52,10 +58,6 @@ TEST(MAPTESTS, TEST_CR) {
     vector<Edge*> roads;
 
     map.crucialRoads(roads);
-    for (Edge* e : roads) {
-        std::cout << e->source->name;
-        std::cout << e->target->name;
-    }
     ASSERT_EQ(roads[0]->source->name, "C");
     ASSERT_EQ(roads[0]->target->name, "D");
 }

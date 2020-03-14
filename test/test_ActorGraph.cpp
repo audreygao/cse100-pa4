@@ -1,3 +1,9 @@
+/**
+ * Author: Ya Gao, Qingyang Xu
+ * Emails: yag003@ucsd.edu, q4xu@ucsd.edu
+ * Description: this file contains tests for the
+ * ActorGraph and its functionalities
+ */
 #include <gtest/gtest.h>
 #include "Actor.hpp"
 #include "ActorGraph.hpp"
@@ -5,11 +11,9 @@
 using namespace std;
 using namespace testing;
 
-// TODO: add tests for actor graph
+// add tests for actor graph
 TEST(ActorGraphTests, test1) {
     ActorGraph graph;
-
-    // graph.buildGraphFromFile("data/small_actor_graph.tsv");
 
     graph.helperFill("Kevin Bacon", "X-Men: First Class", 2011);
     graph.helperFill("James McAvoy", "X-Men: First Class", 2011);
@@ -36,9 +40,4 @@ TEST(ActorGraphTests, test2) {
     graph.BFS("Kevin Bacon", "James McAvoy", path);
     ASSERT_EQ(path,
               "(Kevin Bacon)--[X-Men: First Class#@2011]-->(James McAvoy)");
-    // string path;
-    // graph.BFS("Robert Downey Jr.", "James McAvoy", path);
-    // ASSERT_EQ(path,
-    //           "(Robert Downey Jr.)--[Avengers: Endgame#@2019]-->(Samuel L. "
-    //           "Jackson)--[Glass#@2019]-->(James McAvoy)");
 }

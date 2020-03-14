@@ -1,3 +1,9 @@
+/**
+ * Author: Ya Gao, Qingyang Xu
+ * Emails: yag003@ucsd.edu, q4xu@ucsd.edu
+ * Description: this file contains information for the
+ * Actor class
+ */
 #ifndef ACTOR_HPP
 #define ACTOR_HPP
 #include <string>
@@ -7,9 +13,12 @@ using namespace std;
 
 class Movie;
 
+/**
+ * this class define the Actor object
+ * that serves as a vertex in the
+ * graph
+ */
 class Actor {
-  private:
-    /* data */
   public:
     string name;
     vector<Movie*> movieList;
@@ -22,10 +31,6 @@ class Actor {
         name = actorName;
         previous = 0;
     }
-    //~Actor();
 };
 
-// Actor(string actorName) {}
-
-// Actor::~Actor() {}
 #endif

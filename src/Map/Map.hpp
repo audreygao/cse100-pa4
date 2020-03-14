@@ -1,3 +1,9 @@
+/**
+ * Author: Ya Gao, Qingyang Xu
+ * Emails: yag003@ucsd.edu, q4xu@ucsd.edu
+ * Description: this file contains information for the
+ * Map class including methods and helper method headers
+ */
 #ifndef MAP_HPP
 #define MAP_HPP
 
@@ -11,11 +17,18 @@
 
 using namespace std;
 
+/**
+ * this class defines functionalities of the Map
+ * including finding the shortest path between two vertices,
+ * finding the minimum spanning tree, and finding
+ * the crucial road in the graph
+ */
 class Map {
   private:
     // vector storing vertices in the map: id of each vertex = index in vector
     vector<Vertex*> vertices;
 
+    // the data structure for storing the uptree
     vector<int> upIndex;
 
     // Map: name of vertex -> id of vertex = index storing vertex ptr
@@ -37,27 +50,50 @@ class Map {
      */
     bool addEdge(const string& name1, const string& name2);
 
-    // public:
-    /* TODO */
+    /* constructor */
     Map();
 
     /* Build the map graph from vertex and edge files */
     bool buildMapFromFile(const string& vertexFileName,
                           const string& edgeFileName);
 
-    /* TODO */
+    /**
+     * ind the weighted shortest path from vertex with name “from” to vertex
+     * with name “to” in the map graph using Dijkstra’s algorithm
+     * if there's no path, shortestPath should remain empty
+     */
     void Dijkstra(const string& from, const string& to,
                   vector<Vertex*>& shortestPath);
 
+    /**
+     * union method for the uptree
+     * union the two vertices with optimization
+     */
     void combine(Vertex* a, Vertex* b);
 
+    /**
+     * find method for the uptree
+     * return the index of the vertex v's centinode in the uptree
+     */
     int find(Vertex* v);
 
-    /* TODO */
+    /**
+     * Find all the undirected edges in the minimum spanning tree of the map
+     * graph.
+     */
     void findMST(vector<Edge*>& MST);
 
+    /**
+     * perform a BFS search from from to to ignoring the direct edge between
+     * them to determine if this edge is a bridge
+     * Return true if can be reached, not a bridge, false otherwise
+     */
     bool BFS(Vertex* from, Vertex* to);
-    /* TODO */
+
+    /**
+     * Find all the edges representing crucial roads in the map graph
+     * and put them in roads, no order required
+     */
     void crucialRoads(vector<Edge*>& roads);
 
     /* Destructor of Map graph */

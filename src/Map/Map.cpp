@@ -1,8 +1,13 @@
-
+/**
+ * Author: Ya Gao, Qingyang Xu
+ * Emails: yag003@ucsd.edu, q4xu@ucsd.edu
+ * Description: this file contains information for the
+ * map including methods to realize its functionality
+ */
 #include "Map.hpp"
 #include <climits>
 #include <queue>
-/* TODO */
+/* constructor */
 Map::Map() {}
 
 /* Build the map graph from vertex and edge files */
@@ -90,22 +95,22 @@ bool Map::addEdge(const string& name1, const string& name2) {
 }
 
 // comparator for priority queue
-bool cmp(Vertex* a, Vertex* b) {
-    return a->dist > b->dist;
-
-    // // different frequency, return the one with larger frequncy
-    // if (a.second != b.second) {
-    //     return a.second < b.second;
-    // }
-
-    // // same frequency, compare ascii value of string
-    // return a.first > b.first;
+bool cmp(pair<Vertex*, float> a, pair<Vertex*, float> b) {
+    return a.second > b.second;  // smaller cost has higher priority
 }
 
-/* TODO */
+/**
+ * ind the weighted shortest path from vertex with name “from” to vertex
+ * with name “to” in the map graph using Dijkstra’s algorithm
+ * if there's no path, shortestPath should remain empty
+ */
 void Map::Dijkstra(const string& from, const string& to,
                    vector<Vertex*>& shortestPath) {
-    priority_queue<Vertex*, vector<Vertex*>, decltype(&cmp)> que(cmp);
+    // priority_queue<Vertex*, vector<Vertex*>, decltype(&cmp)> que(cmp);
+
+    priority_queue<pair<Vertex*, float>, vector<pair<Vertex*, float>>,
+                   decltype(&cmp)>
+        que(cmp);
 
     // set dist, done and parent
     for (Vertex* v : vertices) {
@@ -114,28 +119,35 @@ void Map::Dijkstra(const string& from, const string& to,
         v->parent = nullptr;
     }
 
+    // push the source vertex to the pq
     Vertex* start = vertices.at(vertexId[from]);
     start->dist = 0;
-    que.push(start);
+    que.push(make_pair(start, 0));
 
     while (!que.empty()) {
-        Vertex* parent = que.top();
+        // get the vertex with lowest cost
+        Vertex* parent = que.top().first;
         que.pop();
 
         if (!parent->done) {
-            parent->done = true;
+            parent->done = true;  // set to done
+
+            // for each neighbor
             for (Edge* e : parent->outEdges) {
                 Vertex* target = e->target;
                 float c = parent->dist + e->weight;
+
+                // update dist with the cost that's lower
                 if (c < target->dist) {
                     target->parent = parent;
                     target->dist = c;
-                    que.push(target);
+                    que.push(make_pair(target, c));
                 }
             }
         }
     }
 
+    // backtrack to find the path
     Vertex* end = vertices.at(vertexId[to]);
     Vertex* prev = end;
     while (prev != 0) {
@@ -144,8 +156,13 @@ void Map::Dijkstra(const string& from, const string& to,
     }
 }
 
+/* comparator, the smaller weight has higher priority */
 bool cmpEdge(Edge* a, Edge* b) { return a->weight > b->weight; }
 
+/**
+ * union method for the uptree
+ * union the two vertices with optimization
+ */
 void Map::combine(Vertex* a, Vertex* b) {
     // index of both's centinodes
     int indexA = find(a);
@@ -171,6 +188,10 @@ void Map::combine(Vertex* a, Vertex* b) {
     }
 }
 
+/**
+ * find method for the uptree
+ * return the index of the vertex v's centinode in the uptree
+ */
 int Map::find(Vertex* v) {
     vector<int> indices;
     int index = vertexId[v->name];
@@ -192,7 +213,10 @@ int Map::find(Vertex* v) {
     return root;
 }
 
-/* TODO */
+/**
+ * Find all the undirected edges in the minimum spanning tree of the map
+ * graph.
+ */
 void Map::findMST(vector<Edge*>& MST) {
     // initialize the up trees
     upIndex = vector<int>(vertices.size(), -1);
@@ -218,13 +242,12 @@ void Map::findMST(vector<Edge*>& MST) {
     }
 }
 
+/**
+ * perform a BFS search from from to to ignoring the direct edge between
+ * them to determine if this edge is a bridge
+ * Return true if can be reached, not a bridge, false otherwise
+ */
 bool Map::BFS(Vertex* from, Vertex* to) {
-    // for (Vertex* v : vertices) {
-    //     v->done = false;
-    //     // v->dist = INT_MAX;
-    //     // v->parent = nullptr;
-    // }
-
     queue<Vertex*> que;
 
     que.push(from);
@@ -233,43 +256,47 @@ bool Map::BFS(Vertex* from, Vertex* to) {
         Vertex* v = que.front();
         que.pop();
         v->done = true;
-        std::cout << v->name << endl;
+
+        // for each neighbor of the vertex
         for (Edge* edge : v->outEdges) {
             Vertex* next = edge->target;
 
-            // skip this edge
+            // skip this edge if it's the edge between from and to
             if ((v == from && next == to) || (v == to && next == from)) {
                 continue;
             }
+
+            // push neighbor to queue if it's not done(added) yet
             if (!next->done) {
                 que.push(next);
+                next->done = true;  // mark it as added
             }
+
+            // if the neighbor is to -> can be reached
             if (next == to) {
-                std::cout << v->name << endl;
-                std::cout << next->name << endl;
-                std::cout << "true" << endl;
-                return true;
+                return true;  // not a bridge
             }
         }
     }
-    std::cout << "false" << endl;
+
+    // cannot be reached, is a bridge
     return false;
 }
 
-/* TODO */
+/**
+ * Find all the edges representing crucial roads in the map graph
+ * and put them in roads, no order required
+ */
 void Map::crucialRoads(vector<Edge*>& roads) {
-    // for (Vertex* v : vertices) {
-    //     v->done = false;
-    //     // v->dist = INT_MAX;
-    //     // v->parent = nullptr;
-    // }
-
     for (Edge* edge : undirectedEdges) {
+        // reset all the values for searching
         for (Vertex* v : vertices) {
             v->done = false;
-            // v->dist = INT_MAX;
-            // v->parent = nullptr;
+            v->dist = INT_MAX;
+            v->parent = nullptr;
         }
+
+        // perform  BFS
         if (!BFS(edge->source, edge->target)) {
             roads.push_back(edge);
         }
